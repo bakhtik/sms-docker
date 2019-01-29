@@ -25,7 +25,13 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	generateHTML(w, nil, "layout", "navbar", "index")
+	// fmt.Fprint(w, "Hello, World!")
+	data := struct {
+		Info string
+	}{
+		"Hola pataliebre!",
+	}
+	generateHTML(w, data, "layout", "navbar", "index")
 }
 
 func generateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
