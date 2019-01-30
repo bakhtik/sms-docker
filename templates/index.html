@@ -1,6 +1,8 @@
 {{ define "content" }}
     <p>Welcome to Security Management System Docker edition!</p>
-    {{ if . }}
-    <p>{{ .Info }}</p>
+    {{ if .Error }}
+    <p>Visits counting error: {{ .Error.Error }}</p>
+    {{ else }}
+    <p>Visits: {{ .Visits }}</p>
     {{ end }}
 {{ end }}

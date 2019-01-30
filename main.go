@@ -12,7 +12,7 @@ func main() {
 	files := http.FileServer(http.Dir("public"))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
-	mux.HandleFunc("/", index)
+	mux.HandleFunc("/index", index)
 
 	server := &http.Server{
 		Addr:    "0.0.0.0:8080",
@@ -25,11 +25,18 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	// fmt.Fprint(w, "Hello, World!")
+
+	visits, err := redisClient.Incr("counter").Result()
+	if err != nil {
+		log.Println(err)
+	}
+
 	data := struct {
-		Info string
+		Visits int64
+		Error  error
 	}{
-		"Hola pataliebre!",
+		visits,
+		err,
 	}
 	generateHTML(w, data, "layout", "navbar", "index")
 }
