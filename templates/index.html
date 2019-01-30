@@ -1,5 +1,6 @@
 {{ define "content" }}
     <p>Welcome to Security Management System Docker edition!</p>
+    <p>Hostname: {{ .Hostname }}</p>
     {{ if .Error }}
     <p>Visits counting error: {{ .Error.Error }}</p>
     {{ else }}

@@ -1,7 +1,7 @@
 FROM golang:latest as builder
 RUN mkdir -p /app/public
 RUN go get -u -v github.com/go-redis/redis
-COPY ./*.go /app/
+COPY . /app/
 WORKDIR /app
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 

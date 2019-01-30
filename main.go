@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -12,7 +13,7 @@ func main() {
 	files := http.FileServer(http.Dir("public"))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
-	mux.HandleFunc("/index", index)
+	mux.HandleFunc("/", index)
 
 	server := &http.Server{
 		Addr:    "0.0.0.0:8080",
@@ -26,18 +27,30 @@ func main() {
 
 func index(w http.ResponseWriter, r *http.Request) {
 
+	var visitsErr error
 	visits, err := redisClient.Incr("counter").Result()
+	if err != nil {
+		log.Println(err)
+		visitsErr = err
+	}
+
+	hostname, err := os.Hostname()
 	if err != nil {
 		log.Println(err)
 	}
 
 	data := struct {
-		Visits int64
-		Error  error
+		Hostname string
+		Visits   int64
+		Error    error
 	}{
+		hostname,
 		visits,
-		err,
+		visitsErr,
 	}
+
+	// log.Println(r.RemoteAddr, r.RequestURI, r.Referer())
+
 	generateHTML(w, data, "layout", "navbar", "index")
 }
 
