@@ -1,14 +1,15 @@
 FROM golang:latest as builder
-RUN mkdir -p /app/public
 RUN go get -u -v github.com/go-redis/redis
-COPY . /app/
+ADD . /app
 WORKDIR /app
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+RUN go build -o main .
 
-FROM scratch
-WORKDIR /app
-COPY --from=builder /app/main .
-COPY public/ /app/public
-COPY templates/ /app/templates
-EXPOSE 80
+# RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+# FROM scratch
+# WORKDIR /app
+# COPY --from=builder /app/main .
+# COPY public/ /app/public
+# COPY templates/ /app/templates
+EXPOSE 8080
 CMD ["./main"]
