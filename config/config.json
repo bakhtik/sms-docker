@@ -1,0 +1,10 @@
+{
+    "Server": {
+        "Hostname": "",
+        "HTTPPort": 8080
+    },
+    "Cache": {
+        "Hostname": "localhost",
+        "Port": 6379
+    }
+}
