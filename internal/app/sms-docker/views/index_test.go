@@ -1,4 +1,4 @@
-package main
+package views
 
 import (
 	"io/ioutil"
@@ -6,13 +6,16 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	_ "github.com/bakhtik/sms-docker/internal/pkg/testing"
+	"github.com/go-redis/redis"
 )
 
 func TestIndexHandler(t *testing.T) {
-
+	redisClient := redis.NewClient(&redis.Options{})
 	req := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
-	h := indexHandler()
+	h := IndexHandler(redisClient)
 	h.ServeHTTP(w, req)
 
 	resp := w.Result()
