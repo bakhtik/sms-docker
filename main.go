@@ -13,10 +13,10 @@ func main() {
 	files := http.FileServer(http.Dir("public"))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
-	mux.HandleFunc("/", index)
+	mux.Handle("/", indexHandler())
 
 	server := &http.Server{
-		Addr:    "0.0.0.0:8080",
+		Addr:    ":8080",
 		Handler: mux,
 	}
 
@@ -25,33 +25,34 @@ func main() {
 	}
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
+func indexHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var visitsErr error
+		visits, err := getVisitsCount()
+		if err != nil {
+			log.Println(err)
+			visitsErr = err
+		}
 
-	var visitsErr error
-	visits, err := getVisitsCount()
-	if err != nil {
-		log.Println(err)
-		visitsErr = err
-	}
+		hostname, err := os.Hostname()
+		if err != nil {
+			log.Println(err)
+		}
 
-	hostname, err := os.Hostname()
-	if err != nil {
-		log.Println(err)
-	}
+		data := struct {
+			Hostname string
+			Visits   int64
+			Error    error
+		}{
+			hostname,
+			visits,
+			visitsErr,
+		}
 
-	data := struct {
-		Hostname string
-		Visits   int64
-		Error    error
-	}{
-		hostname,
-		visits,
-		visitsErr,
-	}
+		log.Println(r.RemoteAddr, r.RequestURI, r.Referer())
 
-	log.Println(r.RemoteAddr, r.RequestURI, r.Referer())
-
-	generateHTML(w, data, "layout", "navbar", "index")
+		generateHTML(w, data, "layout", "navbar", "index")
+	})
 }
 
 func generateHTML(w http.ResponseWriter, data interface{}, fn ...string) {
@@ -72,8 +73,4 @@ func getVisitsCount() (visits int64, err error) {
 		}
 	}
 	return 0, err
-}
-
-func Foo() string {
-	return "hola!"
 }
