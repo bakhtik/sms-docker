@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/go-redis/redis"
+	"github.com/bakhtik/sms-docker/internal/app/sms-docker/model"
 )
 
-func IndexHandler(redisClient *redis.Client) http.Handler {
+func IndexHandler(cache model.Cache) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var visitsErr error
-		visits, err := getVisitsCount(redisClient)
+		visits, err := getVisitsCount(cache)
 		if err != nil {
 			log.Println(err)
 			visitsErr = err
@@ -39,9 +39,9 @@ func IndexHandler(redisClient *redis.Client) http.Handler {
 }
 
 // handling transient errors
-func getVisitsCount(redisClient *redis.Client) (visits int64, err error) {
+func getVisitsCount(cache model.Cache) (visits int64, err error) {
 	for retry := 0; retry < 5; retry++ {
-		visits, err = redisClient.Incr("counter").Result()
+		visits, err = cache.Increment("counter")
 		if err == nil {
 			return
 		}

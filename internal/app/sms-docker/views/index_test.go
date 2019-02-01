@@ -8,14 +8,20 @@ import (
 	"testing"
 
 	_ "github.com/bakhtik/sms-docker/internal/pkg/testing"
-	"github.com/go-redis/redis"
 )
 
+type CacheMock struct{}
+
+func (cm *CacheMock) Increment(key string) (result int64, err error) {
+	return 42, nil
+}
+
 func TestIndexHandler(t *testing.T) {
-	redisClient := redis.NewClient(&redis.Options{})
+
+	cache := &CacheMock{}
 	req := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
-	h := IndexHandler(redisClient)
+	h := IndexHandler(cache)
 	h.ServeHTTP(w, req)
 
 	resp := w.Result()
@@ -26,5 +32,8 @@ func TestIndexHandler(t *testing.T) {
 	}
 	if strings.Contains(string(body), "Welcome to Security Management System Docker edition!") == false {
 		t.Errorf("Body does not contain 'Welcome to Security Management System Docker edition!'")
+	}
+	if strings.Contains(string(body), "Visits: 42") == false {
+		t.Errorf("Body does not contain 'Visits: 42'")
 	}
 }
