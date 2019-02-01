@@ -1,8 +1,8 @@
 FROM golang:latest as builder
 RUN go get -u -v github.com/go-redis/redis
-ADD . /app
-WORKDIR /app
-RUN go build -o main .
+ADD . /go/src/github.com/bakhtik/sms-docker
+WORKDIR /go/src/github.com/bakhtik/sms-docker
+RUN go build -o main cmd/sms-docker/main.go
 
 # RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 

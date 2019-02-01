@@ -10,7 +10,7 @@ import (
 
 func main() {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: ":6379", // "redis:6379" when in container
+		Addr: "redis:6379", // "redis:6379" when in container
 	})
 
 	mux := http.NewServeMux()
